@@ -1,0 +1,2648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rocky Hacks Store</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #0A0612;
+      --bg-elev: #13091F;
+      --bg-card: rgba(28, 16, 48, 0.65);
+      --bg-glass: rgba(35, 20, 60, 0.5);
+      --border-soft: rgba(168, 85, 247, 0.18);
+      --border-mid: rgba(168, 85, 247, 0.35);
+      --purple-1: #A855F7;
+      --purple-2: #7C3AED;
+      --purple-3: #C084FC;
+      --gold-1: #FBBF24;
+      --gold-2: #F59E0B;
+      --pink-accent: #EC4899;
+      --success: #10B981;
+      --success-hover: #059669;
+      --danger: #EF4444;
+      --warning: #F59E0B;
+      --text-hi: #F5F3FF;
+      --text-mid: #B8AEC8;
+      --text-low: #6B5F7D;
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-xl: 32px;
+      --font-display: 'Orbitron', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-base);
+      color: var(--text-mid);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: -20%; left: -10%;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: float1 20s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -20%; right: -10%;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(251, 191, 36, 0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: float2 25s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+    @keyframes float1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(100px, 50px) scale(1.2); }
+    }
+    @keyframes float2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-100px, -50px) scale(1.15); }
+    }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg-elev); }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, var(--purple-1), var(--purple-2));
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: var(--gold-1); }
+
+    .loading-overlay {
+      position: fixed; inset: 0;
+      background: rgba(10, 6, 18, 0.98);
+      backdrop-filter: blur(20px);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    .loading-overlay.active { display: flex; }
+    .loading-container {
+      position: relative;
+      width: 160px; height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+    .loading-logo {
+      width: 100px; height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid transparent;
+      background: linear-gradient(var(--bg-elev), var(--bg-elev)) padding-box,
+                  linear-gradient(135deg, var(--purple-1), var(--gold-1), var(--purple-1)) border-box;
+      box-shadow: 0 0 30px rgba(168, 85, 247, 0.6), 0 0 60px rgba(251, 191, 36, 0.3);
+      animation: logoPulse 2s ease-in-out infinite;
+      z-index: 2;
+      padding: 6px;
+    }
+    .loading-spinner-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      border-top-color: var(--purple-1);
+      border-right-color: var(--gold-1);
+      animation: spin 1.4s linear infinite;
+      filter: drop-shadow(0 0 12px var(--purple-1));
+    }
+    .loading-spinner-ring::before {
+      content: '';
+      position: absolute;
+      inset: 12px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-bottom-color: var(--pink-accent);
+      border-left-color: var(--purple-3);
+      animation: spinReverse 2s linear infinite;
+      opacity: 0.8;
+    }
+    .loading-spinner-ring::after {
+      content: '';
+      position: absolute;
+      inset: -14px;
+      border-radius: 50%;
+      border: 1px dashed var(--border-mid);
+      animation: spin 4s linear infinite reverse;
+      opacity: 0.6;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes spinReverse { to { transform: rotate(-360deg); } }
+    @keyframes logoPulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(168, 85, 247, 0.6), 0 0 60px rgba(251, 191, 36, 0.3); }
+      50% { transform: scale(1.06); box-shadow: 0 0 50px rgba(168, 85, 247, 0.9), 0 0 90px rgba(251, 191, 36, 0.5); }
+    }
+    .loading-text {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, var(--purple-1), var(--gold-1), var(--purple-1));
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer 3s linear infinite;
+    }
+    @keyframes shimmer { to { background-position: 200% center; } }
+
+    .notification-toast {
+      position: fixed;
+      top: 90px; right: 16px; left: 16px;
+      margin: 0 auto;
+      max-width: 380px;
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-mid);
+      border-left: 4px solid var(--purple-1);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      color: var(--text-hi);
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 10001;
+      display: none;
+      animation: toastIn 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+      box-shadow: var(--shadow-card);
+    }
+    @keyframes toastIn {
+      from { transform: translateY(-30px) scale(0.9); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    .notification-toast.show { display: block; }
+    .notification-toast.success { border-left-color: var(--success); }
+    .notification-toast.error { border-left-color: var(--danger); }
+
+    .header {
+      background: rgba(19, 9, 31, 0.85);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-bottom: 1px solid var(--border-soft);
+      padding: 14px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    }
+    .hamburger {
+      width: 28px; height: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      z-index: 1001;
+      flex-shrink: 0;
+    }
+    .hamburger span {
+      width: 100%; height: 2.5px;
+      background: linear-gradient(90deg, var(--purple-1), var(--gold-1));
+      border-radius: 3px;
+      transition: all 0.3s;
+      box-shadow: 0 0 8px var(--purple-1);
+    }
+    .hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(6px, 6px); }
+    .hamburger.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(6px, -6px); }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      justify-content: center;
+    }
+    .brand-logo {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--purple-1);
+      box-shadow: 0 0 15px var(--purple-1);
+      display: block;
+      padding: 2px;
+      background: var(--bg-elev);
+      flex-shrink: 0;
+    }
+    .brand-name {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, var(--purple-3) 0%, var(--gold-1) 50%, var(--purple-1) 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer 4s linear infinite;
+      filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.5));
+      white-space: nowrap;
+    }
+    .brand-sub {
+      font-size: 9px;
+      color: var(--purple-3);
+      font-family: var(--font-display);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: -2px;
+      opacity: 0.7;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0; left: -340px;
+      width: 320px; height: 100vh;
+      background: linear-gradient(180deg, rgba(19, 9, 31, 0.98), rgba(10, 6, 18, 0.98));
+      backdrop-filter: blur(24px);
+      border-right: 1px solid var(--border-soft);
+      padding: 90px 16px 24px;
+      transition: left 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      z-index: 999;
+      overflow-y: auto;
+    }
+    .sidebar.active {
+      left: 0;
+      box-shadow: 20px 0 60px rgba(0, 0, 0, 0.8), 0 0 60px rgba(168, 85, 247, 0.2);
+    }
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      opacity: 0;
+      visibility: hidden;
+      transition: 0.4s;
+      z-index: 998;
+    }
+    .sidebar-overlay.active { opacity: 1; visibility: visible; }
+
+    .menu-category {
+      font-family: var(--font-display);
+      font-size: 10px;
+      color: var(--text-low);
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: 2.5px;
+      margin: 22px 0 10px 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .menu-category::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple-1), var(--gold-1));
+      box-shadow: 0 0 8px var(--purple-1);
+    }
+    .menu-category::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--border-soft), transparent);
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      color: var(--text-mid);
+      font-size: 14px;
+      font-weight: 600;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.05), rgba(251, 191, 36, 0.02));
+      border: 1px solid transparent;
+      position: relative;
+      overflow: hidden;
+    }
+    .menu-item::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--purple-1), var(--gold-1));
+      transform: scaleY(0);
+      transition: transform 0.3s;
+      border-radius: 0 3px 3px 0;
+    }
+    .menu-item:hover {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(251, 191, 36, 0.05));
+      color: var(--text-hi);
+      border-color: var(--border-soft);
+      transform: translateX(4px);
+    }
+    .menu-item:hover::before { transform: scaleY(1); }
+    .menu-item.active {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(251, 191, 36, 0.1));
+      color: var(--text-hi);
+      border-color: var(--purple-1);
+      box-shadow: 0 0 20px rgba(168, 85, 247, 0.3), inset 0 0 15px rgba(168, 85, 247, 0.1);
+    }
+    .menu-item.active::before { transform: scaleY(1); }
+
+    .menu-item .icon-box {
+      width: 38px; height: 38px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(251, 191, 36, 0.08));
+      border: 1px solid var(--border-soft);
+      flex-shrink: 0;
+      transition: all 0.3s;
+    }
+    .menu-item .icon-box i {
+      color: var(--purple-3);
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    .menu-item:hover .icon-box {
+      background: linear-gradient(135deg, var(--purple-1), var(--purple-2));
+      border-color: var(--purple-1);
+      box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+    }
+    .menu-item:hover .icon-box i {
+      color: #FFFFFF;
+      transform: scale(1.15);
+    }
+    .menu-item.active .icon-box {
+      background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
+      border-color: var(--gold-1);
+      box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+    }
+    .menu-item.active .icon-box i {
+      color: #0A0612;
+    }
+
+    .menu-item .menu-label {
+      flex: 1;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .menu-item::after {
+      content: '\f054';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      font-size: 10px;
+      color: var(--text-low);
+      opacity: 0;
+      transform: translateX(-5px);
+      transition: all 0.3s;
+    }
+    .menu-item:hover::after,
+    .menu-item.active::after {
+      opacity: 1;
+      transform: translateX(0);
+      color: var(--gold-1);
+    }
+
+    .sidebar-footer {
+      margin-top: 30px;
+      padding: 16px;
+      text-align: center;
+      border-top: 1px solid var(--border-soft);
+    }
+    .sidebar-footer .footer-brand {
+      font-family: var(--font-display);
+      font-size: 10px;
+      color: var(--text-low);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .sidebar-footer .footer-version {
+      font-family: var(--font-display);
+      font-size: 9px;
+      color: var(--purple-3);
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px;
+      position: relative;
+      z-index: 1;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-bottom: 14px;
+      position: relative;
+      color: var(--text-hi);
+    }
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 60px; height: 3px;
+      background: linear-gradient(90deg, var(--purple-1), var(--gold-1));
+      border-radius: 3px;
+      box-shadow: 0 0 15px var(--purple-1);
+    }
+    .section-title i {
+      color: var(--gold-1);
+      font-size: 20px;
+    }
+    .tab-content { display: none; animation: fadeSlide 0.5s; }
+    .tab-content.active { display: block; }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .search-box { position: relative; margin-bottom: 28px; }
+    .search-box input {
+      width: 100%;
+      padding: 18px 24px 18px 56px;
+      background: var(--bg-glass);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      color: var(--text-hi);
+      font-size: 15px;
+      font-family: var(--font-body);
+      font-weight: 500;
+      transition: all 0.4s;
+    }
+    .search-box input::placeholder { color: var(--text-low); }
+    .search-box input:focus {
+      border-color: var(--purple-1);
+      outline: none;
+      box-shadow: 0 0 30px rgba(168, 85, 247, 0.3);
+    }
+    .search-box i {
+      position: absolute;
+      left: 22px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--purple-3);
+      font-size: 18px;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 22px;
+      margin-bottom: 44px;
+      width: 100%;
+    }
+
+    .product-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      height: 100%;
+      width: 100%;
+    }
+    .product-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--purple-1), var(--gold-1), var(--pink-accent));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.5s;
+    }
+    .product-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--purple-1);
+      box-shadow: 0 15px 40px rgba(168, 85, 247, 0.4);
+    }
+    .product-card:hover::before { transform: scaleX(1); }
+
+    .product-image {
+      width: 100%;
+      height: 170px;
+      object-fit: cover;
+      border-radius: var(--radius-md);
+      margin-bottom: 12px;
+      border: 1px solid var(--border-soft);
+      background: var(--bg-elev);
+    }
+
+    .product-video-wrap {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: var(--radius-md);
+      margin-bottom: 12px;
+      border: 2px solid var(--border-soft);
+      background: #000;
+      overflow: hidden;
+      position: relative;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .product-video-wrap:hover {
+      border-color: var(--purple-1);
+      box-shadow: 0 0 25px rgba(168, 85, 247, 0.5);
+    }
+    .product-video-wrap video,
+    .product-video-wrap iframe {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border: none;
+    }
+    .product-video-wrap::before {
+      content: '\f144';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: linear-gradient(135deg, #ff006e, #ff4d00);
+      color: #fff;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      z-index: 2;
+      box-shadow: 0 4px 12px rgba(255, 0, 110, 0.6);
+      pointer-events: none;
+      animation: pulseVideo 2s infinite;
+    }
+    @keyframes pulseVideo {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 110, 0.7); }
+      70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(255, 0, 110, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 110, 0); }
+    }
+
+    .product-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-hi);
+      margin-bottom: 8px;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.4;
+    }
+    .product-price {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--gold-1), var(--purple-3));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+    .product-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: auto;
+      width: 100%;
+    }
+    .product-actions .btn {
+      padding: 10px 12px;
+      font-size: 12px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-weight: 700;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+    .product-actions .btn-secondary {
+      background: rgba(168, 85, 247, 0.15);
+      border: 1px solid var(--border-mid);
+      color: var(--purple-3);
+    }
+    .product-actions .btn-secondary:hover {
+      background: rgba(168, 85, 247, 0.3);
+      color: var(--gold-1);
+      border-color: var(--gold-1);
+    }
+    .product-actions .btn:not(.btn-secondary) {
+      background: linear-gradient(135deg, var(--purple-1), var(--purple-2));
+      color: #fff;
+      border: none;
+      box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+    }
+    .product-actions .btn:not(.btn-secondary):hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(168, 85, 247, 0.6);
+    }
+    .product-actions .btn-locked {
+      background: linear-gradient(135deg, #EF4444, #DC2626) !important;
+      cursor: not-allowed !important;
+    }
+    .product-actions .btn-locked:hover {
+      transform: none !important;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4) !important;
+    }
+
+    @media (max-width: 979px) {
+      .products-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    }
+    @media (max-width: 768px) {
+      .products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .product-card { padding: 10px; border-radius: var(--radius-md); }
+      .product-image { height: 120px; }
+      .product-video-wrap { margin-bottom: 10px; border-radius: var(--radius-sm); }
+      .product-video-wrap::before {
+        width: 22px; height: 22px; font-size: 10px; top: 6px; right: 6px;
+      }
+      .product-title { font-size: 12px; margin-bottom: 6px; }
+      .product-price { font-size: 14px; margin-bottom: 10px; }
+      .product-actions { grid-template-columns: 1fr; gap: 6px; }
+      .product-actions .btn { padding: 8px 10px; font-size: 11px; }
+    }
+    @media (max-width: 480px) {
+      .products-grid { grid-template-columns: 1fr; gap: 10px; }
+    }
+
+    .btn {
+      padding: 12px 18px;
+      background: linear-gradient(135deg, var(--purple-1), var(--purple-2));
+      border: 1px solid transparent;
+      border-radius: var(--radius-md);
+      color: #FFFFFF;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.35s;
+      text-align: center;
+      font-family: var(--font-body);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 20px rgba(168, 85, 247, 0.35);
+    }
+    .btn:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(168, 85, 247, 0.5);
+    }
+    .btn-secondary {
+      background: rgba(168, 85, 247, 0.1);
+      border: 1px solid var(--border-mid);
+      color: var(--purple-3);
+      box-shadow: none;
+    }
+    .btn-secondary:hover:not(:disabled) {
+      background: rgba(168, 85, 247, 0.2);
+      color: var(--gold-1);
+      border-color: var(--gold-1);
+    }
+    .btn-free {
+      background: linear-gradient(135deg, var(--success), var(--success-hover));
+    }
+    .btn-gold {
+      background: linear-gradient(135deg, var(--gold-1), var(--gold-2));
+      color: #0A0612;
+    }
+
+    .profile-card {
+      background: linear-gradient(135deg, rgba(35, 20, 60, 0.8), rgba(19, 9, 31, 0.9));
+      backdrop-filter: blur(24px);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+      box-shadow: var(--shadow-card);
+      position: relative;
+      overflow: hidden;
+    }
+    .profile-avatar {
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      background: linear-gradient(var(--bg-elev), var(--bg-elev)) padding-box,
+                  linear-gradient(135deg, var(--purple-1), var(--gold-1)) border-box;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-shadow: 0 0 30px rgba(168, 85, 247, 0.5);
+      flex-shrink: 0;
+      padding: 3px;
+    }
+    .profile-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .profile-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 20px;
+      width: 100%;
+    }
+    .stat-box {
+      background: rgba(10, 6, 18, 0.6);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-md);
+      padding: 18px 12px;
+      text-align: center;
+      transition: all 0.4s;
+    }
+    .stat-box.balance-box {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(52, 211, 153, 0.15));
+      border-color: var(--success);
+      cursor: pointer;
+    }
+    .stat-box.balance-box .stat-value {
+      background: linear-gradient(135deg, var(--success), #6EE7B7);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .stat-box.spent-box {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(168, 85, 247, 0.1));
+      border-color: var(--gold-1);
+    }
+    .stat-box:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-mid);
+      box-shadow: 0 8px 30px rgba(168, 85, 247, 0.3);
+    }
+    .stat-box.balance-box:hover {
+      box-shadow: 0 8px 30px rgba(16, 185, 129, 0.4);
+    }
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--purple-3), var(--gold-1));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .stat-label {
+      font-size: 10px;
+      color: var(--text-mid);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      margin-top: 6px;
+    }
+    .stat-value.balance-pulse {
+      animation: balancePulse 1.2s ease;
+    }
+    @keyframes balancePulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); filter: drop-shadow(0 0 20px var(--success)); }
+      100% { transform: scale(1); }
+    }
+
+    .store-banner {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border-soft);
+      margin-bottom: 24px;
+      display: none;
+    }
+    .announcement {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(251, 191, 36, 0.08));
+      border: 1px solid var(--border-mid);
+      border-radius: var(--radius-lg);
+      padding: 18px 24px;
+      color: var(--text-hi);
+      font-weight: 600;
+      margin-bottom: 24px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+    }
+    .announcement i {
+      color: var(--gold-1);
+      font-size: 20px;
+    }
+
+    .data-list { display: flex; flex-direction: column; gap: 14px; }
+    .data-item {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      padding: 18px 22px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      transition: all 0.4s;
+      flex-wrap: wrap;
+    }
+    .data-item:hover {
+      transform: translateX(4px);
+      border-color: var(--border-mid);
+      box-shadow: 0 10px 40px rgba(168, 85, 247, 0.25);
+    }
+    .data-img {
+      width: 64px; height: 64px;
+      object-fit: cover;
+      border-radius: var(--radius-md);
+      border: 2px solid var(--border-soft);
+      flex-shrink: 0;
+    }
+
+    .balance-hero {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(251, 191, 36, 0.15));
+      border: 2px solid var(--success);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      text-align: center;
+      margin-bottom: 28px;
+      box-shadow: 0 0 40px rgba(16, 185, 129, 0.3);
+    }
+    .balance-hero-label {
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: var(--text-mid);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .balance-hero-value {
+      font-family: var(--font-display);
+      font-size: 48px;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--gold-1), var(--success));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 2px;
+      transition: all 0.5s ease;
+    }
+    .balance-hero-value.updated {
+      animation: balancePulse 1s ease;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 6, 18, 0.9);
+      backdrop-filter: blur(12px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal.active { display: flex; animation: fadeSlide 0.4s; }
+    .modal-content {
+      background: linear-gradient(135deg, rgba(35, 20, 60, 0.98), rgba(19, 9, 31, 0.98));
+      border: 1px solid var(--border-mid);
+      border-radius: var(--radius-xl);
+      padding: 30px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 92vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: var(--shadow-card);
+    }
+    .modal-content::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--purple-1), var(--gold-1), var(--pink-accent));
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    }
+    .modal-close {
+      position: absolute;
+      top: 16px; right: 16px;
+      width: 36px; height: 36px;
+      background: rgba(168, 85, 247, 0.1);
+      border: 1px solid var(--border-mid);
+      border-radius: 50%;
+      color: var(--text-hi);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 20px;
+    }
+    .modal-close:hover {
+      background: var(--danger);
+      border-color: var(--danger);
+      transform: rotate(90deg);
+      color: #fff;
+    }
+    .input-group { margin-bottom: 18px; }
+    .input-group label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 12px;
+      color: var(--text-mid);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+    }
+    .input-group input {
+      width: 100%;
+      padding: 15px 18px;
+      background: rgba(10, 6, 18, 0.6);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-md);
+      color: var(--text-hi);
+      font-size: 14px;
+    }
+    .input-group input:focus {
+      border-color: var(--purple-1);
+      outline: none;
+      box-shadow: 0 0 25px rgba(168, 85, 247, 0.3);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 80px 24px;
+      color: var(--text-mid);
+      grid-column: 1 / -1;
+    }
+    .empty-state i {
+      font-size: 60px;
+      background: linear-gradient(135deg, var(--purple-1), var(--gold-1));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      opacity: 0.7;
+      margin-bottom: 18px;
+      display: inline-block;
+    }
+
+    .setting-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 22px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-lg);
+      margin-bottom: 16px;
+    }
+    .setting-item strong {
+      color: var(--text-hi);
+      font-size: 15px;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    #welcomeMessage {
+      text-align: center;
+      padding: 60px 30px;
+      background: linear-gradient(135deg, rgba(35, 20, 60, 0.7), rgba(19, 9, 31, 0.8));
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border-soft);
+      margin-bottom: 40px;
+    }
+    #welcomeMessage h1 {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--purple-3), var(--gold-1));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 14px;
+    }
+    #welcomeMessage a {
+      color: var(--gold-1);
+      font-weight: 700;
+      border-bottom: 2px solid var(--gold-1);
+      text-decoration: none;
+    }
+
+    .locked-screen {
+      text-align: center;
+      padding: 80px 30px;
+      background: linear-gradient(135deg, rgba(35, 20, 60, 0.7), rgba(19, 9, 31, 0.8));
+      border-radius: var(--radius-xl);
+      border: 2px dashed var(--border-mid);
+      margin-bottom: 40px;
+      grid-column: 1 / -1;
+    }
+    .locked-screen i {
+      font-size: 60px;
+      background: linear-gradient(135deg, var(--purple-1), var(--gold-1));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+      display: block;
+    }
+    .locked-screen h3 {
+      color: var(--text-hi);
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .locked-screen p {
+      color: var(--text-mid);
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+    .locked-screen button {
+      padding: 14px 28px;
+      background: linear-gradient(135deg, var(--purple-1), var(--purple-2));
+      border: none;
+      border-radius: var(--radius-md);
+      color: white;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(168, 85, 247, 0.5);
+      transition: all 0.3s;
+    }
+    .locked-screen button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(168, 85, 247, 0.7);
+    }
+
+    .welcome-dialog {
+      background: linear-gradient(135deg, rgba(35, 20, 60, 0.9), rgba(19, 9, 31, 0.95));
+      backdrop-filter: blur(24px);
+      border: 2px solid var(--border-mid);
+      border-radius: var(--radius-xl);
+      padding: 40px 30px;
+      text-align: center;
+      max-width: 720px;
+      margin: 20px auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 60px rgba(168, 85, 247, 0.2);
+      position: relative;
+      overflow: hidden;
+      animation: dialogFadeIn 0.6s ease;
+    }
+    .welcome-dialog::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--purple-1), var(--gold-1), var(--pink-accent));
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    }
+    .welcome-dialog::after {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.08) 0%, transparent 70%);
+      animation: rotateGlow 20s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes dialogFadeIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes rotateGlow {
+      to { transform: rotate(360deg); }
+    }
+    .welcome-dialog-icon {
+      width: 80px; height: 80px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple-1), var(--gold-1));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 40px rgba(168, 85, 247, 0.6), 0 0 60px rgba(251, 191, 36, 0.3);
+      animation: iconPulse 2s ease-in-out infinite;
+      position: relative;
+      z-index: 1;
+    }
+    @keyframes iconPulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(168, 85, 247, 0.6), 0 0 60px rgba(251, 191, 36, 0.3); }
+      50% { transform: scale(1.05); box-shadow: 0 0 60px rgba(168, 85, 247, 0.9), 0 0 90px rgba(251, 191, 36, 0.5); }
+    }
+    .welcome-dialog-icon i {
+      font-size: 40px;
+      color: #FFFFFF;
+    }
+    .welcome-dialog h2 {
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--purple-3), var(--gold-1));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+      position: relative;
+      z-index: 1;
+    }
+    .welcome-dialog p {
+      color: var(--text-mid);
+      font-size: 15px;
+      line-height: 1.8;
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 1;
+    }
+    .welcome-dialog .highlight {
+      color: var(--gold-1);
+      font-weight: 700;
+    }
+    .welcome-dialog .warning {
+      color: var(--danger);
+      font-weight: 700;
+      background: rgba(239, 68, 68, 0.1);
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      display: inline-block;
+      margin: 10px 0;
+      font-size: 13px;
+    }
+
+    @media (max-width: 768px) {
+      .profile-card { padding: 22px; }
+      .profile-avatar { width: 70px; height: 70px; }
+      .stat-value { font-size: 20px; }
+      .section-title { font-size: 16px; }
+      .brand-name { font-size: 14px; }
+      .brand-logo { width: 36px; height: 36px; }
+      .header { padding: 14px 16px; }
+      .container { padding: 16px; }
+      .balance-hero-value { font-size: 36px; }
+      .welcome-dialog { padding: 30px 20px; }
+      .welcome-dialog h2 { font-size: 18px; }
+      .welcome-dialog p { font-size: 13px; }
+      .welcome-dialog-icon { width: 60px; height: 60px; }
+      .welcome-dialog-icon i { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-container">
+      <div class="loading-spinner-ring"></div>
+      <img id="loadingLogo" class="loading-logo" src="https://i.ibb.co/n87GCqHz/cropped-circle-image-1.png" alt="ROCKY HACKS">
+    </div>
+    <div class="loading-text" id="loadingText">LOADING STORE...</div>
+  </div>
+  <div class="notification-toast" id="notificationToast"></div>
+
+  <div class="header">
+    <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="brand-section">
+      <img id="headerLogo" class="brand-logo" src="https://i.ibb.co/n87GCqHz/cropped-circle-image-1.png" alt="Logo">
+      <div style="display: flex; flex-direction: column; align-items: flex-start;">
+        <div id="headerBrandName" class="brand-name">ROCKY HACKS</div>
+        <div class="brand-sub">Premium Store</div>
+      </div>
+    </div>
+    <div style="width: 28px;"></div>
+  </div>
+
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+  <div class="sidebar" id="sidebar">
+    <div class="menu-category">Main Menu</div>
+    <div class="menu-item active" data-tab="home">
+      <div class="icon-box"><i class="fas fa-home"></i></div>
+      <div class="menu-label">Home</div>
+    </div>
+    <div class="menu-item" data-tab="paid" style="display:none;">
+      <div class="icon-box"><i class="fas fa-gem"></i></div>
+      <div class="menu-label">Vip Modz Paid Only</div>
+    </div>
+    <div class="menu-item" data-tab="free" style="display:none;">
+      <div class="icon-box"><i class="fas fa-gift"></i></div>
+      <div class="menu-label">Free Downloads</div>
+    </div>
+
+    <div id="authMenuSection" style="display:none;">
+      <div class="menu-category">My Account</div>
+      <div class="menu-item" data-tab="wallet">
+        <div class="icon-box" style="background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(251, 191, 36, 0.05)); border-color: var(--gold-1);">
+          <i class="fas fa-wallet" style="color: var(--gold-1);"></i>
+        </div>
+        <div class="menu-label">Add Money</div>
+      </div>
+      <div class="menu-item" data-tab="orders">
+        <div class="icon-box"><i class="fas fa-box"></i></div>
+        <div class="menu-label">My Library</div>
+      </div>
+      <div class="menu-item" data-tab="history">
+        <div class="icon-box"><i class="fas fa-history"></i></div>
+        <div class="menu-label">Payment History</div>
+      </div>
+    </div>
+
+    <div class="menu-category">Support</div>
+    <div class="menu-item" data-tab="contact">
+      <div class="icon-box"><i class="fas fa-headset"></i></div>
+      <div class="menu-label">Contact Us</div>
+    </div>
+
+    <div class="menu-category">System</div>
+    <div class="menu-item" data-tab="settings">
+      <div class="icon-box"><i class="fas fa-cog"></i></div>
+      <div class="menu-label">Settings</div>
+    </div>
+
+    <div id="logoutBtn" class="menu-item" style="color:var(--danger); display:none;" onclick="logoutUser()">
+      <div class="icon-box" style="background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.05)); border-color: var(--danger);">
+        <i class="fas fa-power-off" style="color: var(--danger);"></i>
+      </div>
+      <div class="menu-label">Logout</div>
+    </div>
+    <div id="loginBtn" class="menu-item" style="color:var(--success);" onclick="showAuthModal()">
+      <div class="icon-box" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05)); border-color: var(--success);">
+        <i class="fas fa-sign-in-alt" style="color: var(--success);"></i>
+      </div>
+      <div class="menu-label">Login / Register</div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="footer-brand">Rocky Hacks Store</div>
+      <div class="footer-version">v1.0.0 Premium Edition</div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div id="homeTab" class="tab-content active">
+      <div id="announcementBar" class="announcement"><i class="fas fa-bullhorn"></i> <span id="announcementText"></span></div>
+      <img id="storeBanner" class="store-banner" src="">
+
+      <div id="profileCard" class="profile-card" style="display:none;">
+        <div class="profile-avatar">
+          <img id="profileAvatarImg" src="https://i.ibb.co/fz1rRw0v/man-user-circle-icon.png" alt="User Avatar">
+        </div>
+        <div style="flex:1; min-width: 200px;">
+          <h2 style="color:var(--text-hi); font-size:24px; font-weight:800; margin-bottom:6px;" id="profileName">User Name</h2>
+          <p style="color:var(--text-mid); font-size:14px;" id="profileEmail">user@email.com</p>
+          <p style="color:var(--text-low); font-size:12px; margin-top:6px;">Joined: <span id="profileJoined"></span></p>
+          <p style="color:var(--gold-1); font-size:13px; margin-top:4px; font-weight: 700;">Your ID: <span id="profileAdminUsername">RockyXXXXXX</span></p>
+        </div>
+        <div class="profile-stats">
+          <div class="stat-box"><div class="stat-value" id="statPaymentd">0</div><div class="stat-label">Paymentd</div></div>
+          <div class="stat-box"><div class="stat-value" id="statFree">0</div><div class="stat-label">Downloaded</div></div>
+          <div class="stat-box"><div class="stat-value" id="statOrders">0</div><div class="stat-label">Library</div></div>
+          <div class="stat-box balance-box" onclick="showTab('wallet')">
+            <div class="stat-value" id="statBalance">$0.00</div>
+            <div class="stat-label">💰 លុយរបស់ខ្ងុំ</div>
+          </div>
+          <div class="stat-box spent-box">
+            <div class="stat-value" id="statSpent">$0.00</div>
+            <div class="stat-label">💸 លុយដែលបានចាយអស់</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="welcomeMessage">
+        <h1>WELCOME TO ROCKY HACKS STORE</h1>
+        <p>Welcome to Rocky Store and collection of premium and free tools. <a href="#" onclick="showAuthModal()">Login</a> to access your dashboard.</p>
+      </div>
+
+      <h2 class="section-title"><i class="fas fa-bolt"></i> HOME MAIN</h2>
+      <div id="homeLatestGrid" class="products-grid"></div>
+    </div>
+
+    <div id="paidTab" class="tab-content">
+      <h2 class="section-title"><i class="fas fa-gem"></i> Vip Modz Paid Only</h2>
+      <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchPaid" placeholder="Search premium products..." oninput="filterProducts('paid')"></div>
+      <div id="paidGrid" class="products-grid"></div>
+    </div>
+
+    <div id="freeTab" class="tab-content">
+      <h2 class="section-title"><i class="fas fa-gift"></i> Free Downloads</h2>
+      <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchFree" placeholder="Search free products..." oninput="filterProducts('free')"></div>
+      <div id="freeGrid" class="products-grid"></div>
+    </div>
+
+    <div id="walletTab" class="tab-content">
+      <h2 class="section-title"><i class="fas fa-wallet"></i> Add Money</h2>
+      <div class="balance-hero">
+        <div class="balance-hero-label">Current Balance</div>
+        <div class="balance-hero-value" id="walletHeroBalance">$0.00</div>
+      </div>
+      <div class="setting-item" style="flex-direction:column; align-items:stretch; gap:14px; text-align: center;">
+        
+        <div id="walletQrBox" style="margin: 10px 0;"></div>
+
+        <p style="color: var(--gold-1); font-weight: 700; font-size: 15px; margin: 10px 0;">
+          សូមអ្នកពេលដែលបានបាញ់លុយហើយសូមផ្ញើមក Admin 🤩
+        </p>
+
+        <a href="https://t.me/RockyH4cks_og" target="_blank" class="btn" style="width:100%; padding: 16px; font-size: 15px; text-decoration: none; background: linear-gradient(135deg, #0088cc, #00aaff); box-shadow: 0 4px 20px rgba(0, 136, 204, 0.5);">
+          <i class="fab fa-telegram-plane"></i> ឆាតមក Admin តាម Telegram
+        </a>
+      </div>
+
+      <h2 class="section-title" style="margin-top: 40px;"><i class="fas fa-receipt"></i> Top Up History</h2>
+      <div id="walletHistoryList" class="data-list"></div>
+    </div>
+
+    <div id="ordersTab" class="tab-content">
+      <h2 class="section-title"><i class="fas fa-box"></i> My Library</h2>
+      <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchOrders" placeholder="Search my library..." oninput="renderOrders()"></div>
+      <div id="ordersList" class="data-list"></div>
+    </div>
+
+    <div id="historyTab" class="tab-content">
+      <h2 class="section-title"><i class="fas fa-history"></i> Payment History</h2>
+      <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchHistory" placeholder="Search transactions..." oninput="renderHistory()"></div>
+      <div id="historyList" class="data-list"></div>
+    </div>
+
+    <div id="contactTab" class="tab-content">
+      <h2 class="section-title"><i class="fas fa-headset"></i> Support Channels</h2>
+      <div id="contactGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:16px;"></div>
+    </div>
+
+    <div id="settingsTab" class="tab-content">
+      <h2 class="section-title"><i class="fas fa-cog"></i> App Settings</h2>
+      <div id="accountSettingsBlock" style="display:none;">
+        <h3 style="color:var(--gold-1); margin: 30px 0 18px; font-family:var(--font-display); text-transform:uppercase; letter-spacing: 2px; font-size: 14px;">Account Settings</h3>
+        
+        <div class="setting-item" style="flex-direction:column; align-items:stretch; gap:12px;">
+          <div><strong>Your ID (Top Up ID)</strong><span style="font-size:12px;color:var(--text-mid);">ប្រើសម្រាប់ Admin ដាក់លុយចូលគណនី</span></div>
+          <div class="input-group" style="margin-bottom:0;"><input type="text" id="settingAdminUsername" readonly style="opacity:0.8; color: var(--gold-1); font-weight: 700;"></div>
+        </div>
+
+        <div class="setting-item" style="flex-direction:column; align-items:stretch; gap:12px;">
+          <div><strong>Change Username</strong><span style="font-size:12px;color:var(--text-mid);">Update your display name</span></div>
+          <div class="input-group" style="margin-bottom:0;"><input type="text" id="settingCurrentName" readonly style="opacity:0.6;"></div>
+          <div class="input-group" style="margin-bottom:0;"><input type="text" id="settingNewName" placeholder="New Username"></div>
+          <button class="btn btn-secondary" onclick="updateUsername()"><i class="fas fa-save"></i> Save Username</button>
+        </div>
+        <div class="setting-item" style="flex-direction:column; align-items:stretch; gap:12px;">
+          <div><strong>Change Password</strong><span style="font-size:12px;color:var(--text-mid);">Secure your account</span></div>
+          <div class="input-group" style="margin-bottom:0;"><input type="password" id="settingCurrentPassword" placeholder="Current Password"></div>
+          <div class="input-group" style="margin-bottom:0;"><input type="password" id="settingNewPassword" placeholder="New Password"></div>
+          <div class="input-group" style="margin-bottom:0;"><input type="password" id="settingConfirmPassword" placeholder="Confirm New Password"></div>
+          <button class="btn btn-secondary" onclick="updatePassword()"><i class="fas fa-lock"></i> Update Password</button>
+        </div>
+      </div>
+      <h3 style="color:var(--gold-1); margin: 30px 0 18px; font-family:var(--font-display); text-transform:uppercase; letter-spacing: 2px; font-size: 14px;">System Data</h3>
+      <div class="setting-item">
+        <div><strong>App Version</strong><span style="font-size:12px;color:var(--text-mid);">v1.0.0 Custom Sidebar</span></div>
+      </div>
+      <div class="setting-item">
+        <div><strong>Clear Local Cache</strong><span style="font-size:12px;color:var(--text-mid);">Fixes loading issues</span></div>
+        <button class="btn btn-secondary" style="padding:10px 18px;" onclick="localStorage.clear(); showNotification('Cache Cleared! Reloading...'); setTimeout(()=>location.reload(),1000);"><i class="fas fa-trash"></i> Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="authModal" class="modal">
+    <div class="modal-content" style="max-width: 420px;">
+      <span class="modal-close" onclick="closeModal('authModal')">×</span>
+      <h2 class="section-title" id="authTitle" style="border:none; justify-content:center; padding-bottom:0;"><i class="fas fa-fingerprint"></i> Login</h2>
+      <div id="loginForm" style="margin-top: 24px;">
+        <div class="input-group"><label>Email</label><input type="email" id="loginEmail" placeholder="Enter Your Email"></div>
+        <div class="input-group"><label>Password</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
+        <button class="btn" style="width:100%; padding: 15px;" onclick="loginUser()"><i class="fas fa-sign-in-alt"></i> Login</button>
+        <p style="text-align:center; margin-top:22px; font-size:13px; color: var(--text-mid);">New user? <a href="#" style="color:var(--gold-1); font-weight: 700;" onclick="toggleAuthMode('signup')">Create Account</a></p>
+      </div>
+      <div id="signupForm" style="display:none; margin-top: 24px;">
+        <div class="input-group"><label>Username</label><input type="text" id="signupName" placeholder="Enter Your Name"></div>
+        <div class="input-group"><label>Email</label><input type="email" id="signupEmail" placeholder="Enter Your Email"></div>
+        <div class="input-group"><label>Password</label><input type="password" id="signupPassword" placeholder="••••••••"></div>
+        <button class="btn" style="width:100%; padding: 15px;" onclick="signupUser()"><i class="fas fa-user-plus"></i> Register</button>
+        <p style="text-align:center; margin-top:22px; font-size:13px; color: var(--text-mid);">Already have an account? <a href="#" style="color:var(--gold-1); font-weight: 700;" onclick="toggleAuthMode('login')">Login</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div id="aboutModal" class="modal">
+    <div class="modal-content" style="max-width: 720px;">
+      <span class="modal-close" onclick="closeModal('aboutModal')">×</span>
+      <div id="aboutHeaderRow" style="display:flex; gap:22px; flex-wrap:wrap; margin-bottom:24px;">
+        <div id="aboutImageContainer"></div>
+        <div style="flex:1; min-width: 200px;">
+          <h2 id="aboutTitle" style="font-size:22px; color:var(--text-hi); margin-bottom:12px;"></h2>
+          <div id="aboutPrice" style="font-family:var(--font-display); font-size:26px; font-weight:900; margin-bottom:12px;"></div>
+          <div style="display:flex; gap:10px; font-size:11px; color:var(--text-mid); flex-wrap:wrap;">
+            <span style="background:rgba(168, 85, 247, 0.1); padding:6px 12px; border-radius:var(--radius-sm); border:1px solid var(--border-soft);"><i class="fas fa-tag"></i> <span id="aboutCategory"></span></span>
+            <span style="background:rgba(168, 85, 247, 0.1); padding:6px 12px; border-radius:var(--radius-sm); border:1px solid var(--border-soft);"><i class="fas fa-code-branch"></i> v<span id="aboutVersion"></span></span>
+          </div>
+        </div>
+      </div>
+      <div id="aboutGallery" style="display:flex; gap:10px; overflow-x:auto; padding-bottom:10px; margin:18px 0;"></div>
+      <h3 style="color:var(--gold-1); font-family:var(--font-display); margin-bottom:12px; text-transform:uppercase; font-size: 13px;">Description</h3>
+      <div id="aboutDesc" style="color:var(--text-hi); line-height:1.7; font-size:14px; margin-bottom:24px; background:rgba(10, 6, 18, 0.6); padding:18px; border-radius:var(--radius-md);"></div>
+      <div id="aboutActionBtn"></div>
+    </div>
+  </div>
+
+  <div id="successModal" class="modal">
+    <div class="modal-content" style="max-width: 500px; text-align:center;">
+      <span class="modal-close" onclick="closeModal('successModal')">×</span>
+      <div style="width: 90px; height: 90px; margin: 0 auto 20px; border-radius: 50%; background: linear-gradient(135deg, var(--success), var(--success-hover)); display: flex; align-items: center; justify-content: center;">
+        <i class="fas fa-check" style="font-size:44px; color: #FFFFFF;"></i>
+      </div>
+      <h2 style="color:var(--text-hi); margin-bottom:12px;">Access Granted!</h2>
+      <p style="color:var(--text-mid); margin-bottom:28px;" id="successMsg">Your product is ready.</p>
+      <input type="text" id="successLinkInput" readonly style="width:100%; padding:14px; background:rgba(10, 6, 18, 0.6); border:1px solid var(--border-soft); border-radius:var(--radius-md); color:var(--gold-1); margin-bottom:22px; text-align:center;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <button class="btn btn-secondary" onclick="copySuccessLink()"><i class="fas fa-copy"></i> Copy Link</button>
+        <button class="btn btn-free" id="successOpenBtn"><i class="fas fa-external-link-alt"></i> Open Link</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="manualPayModal" class="modal">
+    <div class="modal-content" style="max-width:500px; text-align:center;">
+      <span class="modal-close" onclick="closeModal('manualPayModal')">×</span>
+      <h2 style="color:var(--gold-1); font-family:var(--font-display); margin-bottom:10px; text-transform:uppercase; font-size: 16px;"><i class="fas fa-qrcode"></i> Scan to Pay</h2>
+      <p style="color:var(--text-mid); font-size:13px; margin-bottom:20px;">សូមស្កេន QR Code ខាងក្រោមដើម្បីបង់ប្រាក់</p>
+      <div id="payQrBox" style="margin-bottom:18px;"></div>
+      <div style="font-family:var(--font-display); font-size:28px; font-weight:900; margin-bottom:20px;" id="payAmount"></div>
+      <div class="input-group" style="text-align:left;">
+        <label>UTR / Transaction ID</label>
+        <input type="text" id="payUtr" placeholder="Enter UTR after payment">
+      </div>
+      <button class="btn" style="width:100%; padding: 15px;" onclick="submitManualPayment()">
+        <i class="fas fa-paper-plane"></i> Submit for Verification
+      </button>
+    </div>
+  </div>
+
+  <script>
+    window.safeSet = function(id, prop, val) { const el = document.getElementById(id); if (el) el[prop] = val; };
+    window.escapeHtml = function(t) { if (t === null || t === undefined) return ''; const d = document.createElement('div'); d.textContent = String(t); return d.innerHTML; };
+    window.escapeAttr = function(t) { if (t === null || t === undefined) return ''; return String(t).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+
+    window._loadingTimeout = null;
+    window.showLoading = function(txt) {
+      const el = document.getElementById('loadingOverlay');
+      const t = document.getElementById('loadingText');
+      if (t) t.innerText = txt || 'LOADING...';
+      if (el) el.classList.add('active');
+      clearTimeout(window._loadingTimeout);
+      window._loadingTimeout = setTimeout(function() { window.hideLoading(); }, 10000);
+    };
+    window.hideLoading = function() {
+      clearTimeout(window._loadingTimeout);
+      const el = document.getElementById('loadingOverlay');
+      if (el) el.classList.remove('active');
+    };
+    window.showNotification = function(m, t) {
+      t = t || 'success';
+      const n = document.getElementById('notificationToast');
+      if (!n) return;
+      n.textContent = m;
+      n.className = 'notification-toast show ' + t;
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(function(){ n.classList.remove('show'); }, 4000);
+    };
+    window.closeModal = function(id) { const el = document.getElementById(id); if (el) el.classList.remove('active'); };
+    window.formatCurrency = function(a) { const n = parseFloat(a || 0); return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+
+    window.currentUser = null;
+    window.allProducts = [];
+    window.allOrders = [];
+    window.allPayments = [];
+    window.allTopUps = [];
+    window.userBalance = 0;
+    window.pgSettings = {};
+    window.storeCurrency = '$';
+    window._currentPayOrder = null;
+    window._selectedQuickAmount = null;
+
+    window.QR_IMAGE_URL = "https://i.ibb.co/Z16gTG1H/AMK-KHQR-MOEURN-SOTHY-1790760041055.jpg";
+
+    window.generateAdminUsername = function() {
+      const randomNum = Math.floor(100000 + Math.random() * 900000);
+      return 'Rocky' + randomNum;
+    };
+
+    window.getVideoEmbedUrl = function(url, type) {
+      if (!url || typeof url !== 'string') return { url: '', isMp4: false };
+      url = url.trim();
+      if (url === '') return { url: '', isMp4: false };
+      if (!type || type === 'auto') {
+        if (url.includes('youtube.com') || url.includes('youtu.be')) type = 'youtube';
+        else if (url.includes('vimeo.com')) type = 'vimeo';
+        else type = 'mp4';
+      }
+      if (type === 'youtube') {
+        let id = '';
+        if (url.includes('youtu.be/')) id = url.split('youtu.be/')[1].split(/[?&]/)[0];
+        else if (url.includes('v=')) id = url.split('v=')[1].split('&')[0];
+        else if (url.includes('embed/')) id = url.split('embed/')[1].split(/[?&]/)[0];
+        if (!id || id.trim() === '') return { url: '', isMp4: false };
+        return { url: 'https://www.youtube.com/embed/' + id + '?rel=0&modestbranding=1', isMp4: false };
+      }
+      if (type === 'vimeo') {
+        const id = url.split('vimeo.com/')[1]?.split(/[?&]/)[0];
+        if (!id || id.trim() === '') return { url: '', isMp4: false };
+        return { url: 'https://player.vimeo.com/video/' + id, isMp4: false };
+      }
+      return { url: url, isMp4: true };
+    };
+
+    window.toggleSidebar = function() {
+      const sb = document.getElementById('sidebar');
+      const ov = document.getElementById('sidebarOverlay');
+      const hb = document.getElementById('hamburger');
+      if (sb) sb.classList.toggle('active');
+      if (ov) ov.classList.toggle('active');
+      if (hb) hb.classList.toggle('active');
+    };
+
+    window.showTab = function(tabName) {
+      const protectedTabs = ['paid', 'free', 'wallet', 'orders', 'history'];
+      if (protectedTabs.includes(tabName) && !window.currentUser) {
+        window.showAuthModal();
+        window.showNotification('🔒 សូម Login ជាមុនសិន', 'error');
+        return;
+      }
+
+      const target = document.getElementById(tabName + 'Tab');
+      if (!target) return;
+      document.querySelectorAll('.menu-item').forEach(function(i){ i.classList.remove('active'); });
+      document.querySelectorAll('.tab-content').forEach(function(c){ c.classList.remove('active'); });
+      target.classList.add('active');
+      const menu = document.querySelector('[data-tab="' + tabName + '"]');
+      if (menu) menu.classList.add('active');
+      if (window.innerWidth <= 768) window.toggleSidebar();
+      window.scrollTo(0, 0);
+
+      if (tabName === 'wallet') {
+        window.renderWalletQr();
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.menu-item').forEach(function(el) {
+        if (el.dataset.bound === '1') return;
+        el.dataset.bound = '1';
+        el.addEventListener('click', function() {
+          if (this.id === 'logoutBtn' || this.id === 'loginBtn') {
+            if (window.innerWidth <= 768) window.toggleSidebar();
+            return;
+          }
+          const tab = this.dataset.tab;
+          if (!tab) return;
+          window.showTab(tab);
+        });
+      });
+    });
+
+    window.showAuthModal = function() {
+      window.closeModal('successModal'); window.closeModal('aboutModal'); window.closeModal('manualPayModal');
+      window.toggleAuthMode('login');
+      document.getElementById('authModal')?.classList.add('active');
+    };
+    window.toggleAuthMode = function(m) {
+      const lf = document.getElementById('loginForm');
+      const sf = document.getElementById('signupForm');
+      const at = document.getElementById('authTitle');
+      if (lf) lf.style.display = m === 'login' ? 'block' : 'none';
+      if (sf) sf.style.display = m === 'signup' ? 'block' : 'none';
+      if (at) at.innerHTML = m === 'login' ? '<i class="fas fa-fingerprint"></i> Login' : '<i class="fas fa-user-plus"></i> Register';
+    };
+
+    window.updateAuthUI = async function() {
+      const u = window.currentUser;
+      
+      if (document.getElementById('loginBtn')) document.getElementById('loginBtn').style.display = u ? 'none' : 'flex';
+      if (document.getElementById('logoutBtn')) document.getElementById('logoutBtn').style.display = u ? 'flex' : 'none';
+      if (document.getElementById('authMenuSection')) document.getElementById('authMenuSection').style.display = u ? 'block' : 'none';
+      if (document.getElementById('accountSettingsBlock')) document.getElementById('accountSettingsBlock').style.display = u ? 'block' : 'none';
+
+      const paidMenu = document.querySelector('.menu-item[data-tab="paid"]');
+      const freeMenu = document.querySelector('.menu-item[data-tab="free"]');
+      if (paidMenu) paidMenu.style.display = u ? 'flex' : 'none';
+      if (freeMenu) freeMenu.style.display = u ? 'flex' : 'none';
+
+      const pc = document.getElementById('profileCard');
+      const wm = document.getElementById('welcomeMessage');
+
+      if (u) {
+        if (pc) pc.style.display = 'flex';
+        if (wm) wm.style.display = 'none';
+        let dName = u.displayName;
+        if (!dName && window.firebaseReady && window.db) {
+          try {
+            const snap = await window.dbGet(window.dbRef(window.db, 'users/' + u.uid + '/username'));
+            if (snap.exists()) dName = snap.val();
+          } catch(e) {}
+        }
+        if (!dName) dName = (u.email || 'User').split('@')[0];
+        const avatarImg = document.getElementById('profileAvatarImg');
+        if (avatarImg) avatarImg.src = u.photoURL || 'https://i.ibb.co/fz1rRw0v/man-user-circle-icon.png';
+        window.safeSet('profileName', 'innerText', dName);
+        window.safeSet('profileEmail', 'innerText', u.email);
+        window.safeSet('profileJoined', 'innerText', u.metadata && u.metadata.creationTime ? new Date(u.metadata.creationTime).toLocaleDateString() : 'N/A');
+        window.safeSet('settingCurrentName', 'value', dName);
+
+        let adminUser = 'N/A';
+        if (window.firebaseReady && window.db) {
+          try {
+            const snap = await window.dbGet(window.dbRef(window.db, 'users/' + u.uid + '/adminUsername'));
+            if (snap.exists()) adminUser = snap.val();
+          } catch(e) {}
+        }
+        window.safeSet('profileAdminUsername', 'innerText', adminUser);
+        window.safeSet('settingAdminUsername', 'value', adminUser);
+
+      } else {
+        if (pc) pc.style.display = 'none';
+        if (wm) wm.style.display = 'block';
+      }
+    };
+
+    window.updateProfileStats = function() {
+      if (!window.currentUser) return;
+      let paid = 0, free = 0, totalSpent = 0;
+      window.allOrders.forEach(function(o) {
+        if (o.status === 'confirmed' || o.status === 'paid' || o.status === 'delivered') {
+          const amt = parseFloat(o.finalAmount || 0);
+          if (amt > 0) { paid++; totalSpent += amt; } else { free++; }
+        }
+      });
+      window.safeSet('statPaymentd', 'innerText', paid);
+      window.safeSet('statFree', 'innerText', free);
+      window.safeSet('statOrders', 'innerText', window.allOrders.length);
+      window.safeSet('statSpent', 'innerText', '$' + totalSpent.toFixed(2));
+      window.safeSet('statBalance', 'innerText', '$' + (window.userBalance || 0).toFixed(2));
+      window.safeSet('walletHeroBalance', 'innerText', '$' + (window.userBalance || 0).toFixed(2));
+    };
+
+    window.updateBalanceUI = function(newBalance, oldBalance) {
+      window.userBalance = parseFloat(newBalance || 0);
+      
+      const statBalEl = document.getElementById('statBalance');
+      const walletHeroEl = document.getElementById('walletHeroBalance');
+      
+      if (statBalEl) statBalEl.innerText = '$' + window.userBalance.toFixed(2);
+      if (walletHeroEl) walletHeroEl.innerText = '$' + window.userBalance.toFixed(2);
+      
+      if (oldBalance !== undefined && window.userBalance > parseFloat(oldBalance || 0)) {
+        if (statBalEl) {
+          statBalEl.classList.add('balance-pulse');
+          setTimeout(() => statBalEl.classList.remove('balance-pulse'), 1200);
+        }
+        if (walletHeroEl) {
+          walletHeroEl.classList.add('updated');
+          setTimeout(() => walletHeroEl.classList.remove('updated'), 1000);
+        }
+      }
+      
+      try { window.renderProducts(); } catch(e) {}
+    };
+
+    window.renderWalletQr = function() {
+      const qrBox = document.getElementById('walletQrBox');
+      if (!qrBox) return;
+
+      if (!window.QR_IMAGE_URL) {
+        qrBox.innerHTML = '<div style="padding:16px; background:rgba(239,68,68,0.1); border:1px solid var(--danger); border-radius:var(--radius-md); color:var(--danger); font-size:13px;">⚠️ Admin has not configured QR yet</div>';
+        return;
+      }
+
+      qrBox.innerHTML = `
+        <div style="text-align: center;">
+          <img src="${window.QR_IMAGE_URL}" style="width:260px; height:260px; object-fit:contain; border-radius:var(--radius-md); border:2px solid var(--border-mid); background:#fff; padding:10px; margin:0 auto; display:block;">
+        </div>
+      `;
+    };
+
+    window.renderWalletHistory = function() {
+      const list = document.getElementById('walletHistoryList');
+      if (!list) return;
+      list.innerHTML = '';
+      if (!window.allTopUps || window.allTopUps.length === 0) {
+        list.innerHTML = '<div class="empty-state"><i class="fas fa-wallet"></i><br><h3>No Top Up History</h3></div>';
+        return;
+      }
+      window.allTopUps.forEach(function(t) {
+        const statusColor = t.status === 'Approved' || t.status === 'Success' ? 'var(--success)' : t.status === 'Pending' ? 'var(--warning)' : 'var(--danger)';
+        list.innerHTML += '<div class="data-item">' +
+          '<div style="width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg, var(--gold-1), var(--gold-2)); color:#0A0612; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink: 0;"><i class="fas fa-plus"></i></div>' +
+          '<div style="flex:1; min-width: 180px;">' +
+            '<h3 style="color:var(--text-hi); font-size:14px; font-weight: 700;">Top Up · ' + window.escapeHtml(t.orderId || t.id) + '</h3>' +
+            '<p style="font-size:12px; color:var(--text-mid); margin-top: 4px;">UTR: ' + window.escapeHtml(t.utr || 'N/A') + '</p>' +
+            '<p style="font-size:11px; color:var(--text-low); margin-top: 4px;">' + new Date(t.date || t.createdAt || 0).toLocaleString() + '</p>' +
+          '</div>' +
+          '<div style="text-align:right;">' +
+            '<div style="color:var(--gold-1); font-weight:900; font-family:var(--font-display); font-size:18px;">+' + window.formatCurrency(t.amount) + '</div>' +
+            '<span style="font-size:11px; color:' + statusColor + '; font-weight: 700;">' + (t.status||'').toUpperCase() + '</span>' +
+          '</div>' +
+        '</div>';
+      });
+    };
+
+    function hasPaymentd(productId) {
+      if (!window.currentUser || !window.allOrders) return false;
+      return window.allOrders.some(function(o) { return o.productId === productId && (o.status === 'confirmed' || o.status === 'paid' || o.status === 'delivered'); });
+    }
+
+    function getCardHTML(p) {
+      const isFree = p.type === 'free' || (!p.price || parseFloat(p.price) === 0);
+      const isOwned = hasPaymentd(p.id);
+      const price = parseFloat(p.price || 0);
+      const balance = parseFloat(window.userBalance || 0);
+      const canAfford = isFree || balance >= price;
+      
+      let bBtn = '';
+      if (isOwned) {
+        bBtn = '<button class="btn btn-free" style="flex:1;" onclick="event.stopPropagation(); window.showSuccessFromOwned(\'' + p.id + '\')"><i class="fas fa-check"></i> Owned</button>';
+      } else if (isFree) {
+        bBtn = '<button class="btn btn-free" style="flex:1;" onclick="event.stopPropagation(); window.initBuy(\'' + p.id + '\')"><i class="fas fa-download"></i> Download</button>';
+      } else if (!canAfford) {
+        bBtn = '<button class="btn btn-locked" style="flex:1;" onclick="event.stopPropagation(); window.showNotification(\'❌ លុយមិនគ្រប់គ្រាន់! ត្រូវការ ' + window.formatCurrency(price) + ' ប៉ុន្តែអ្នកមាន ' + window.formatCurrency(balance) + '\', \'error\')"><i class="fas fa-lock"></i> Buy?</button>';
+      } else {
+        bBtn = '<button class="btn" style="flex:1;" onclick="event.stopPropagation(); window.initBuy(\'' + p.id + '\')"><i class="fas fa-shopping-cart"></i> Buy</button>';
+      }
+      
+      const priceDisplay = isFree ? '<span style="color:var(--success); font-family: var(--font-display);"><i class="fas fa-gift"></i> FREE</span>' : window.formatCurrency(price);
+      
+      let mediaHTML = '';
+      
+      if (p.videoUrl && typeof p.videoUrl === 'string' && p.videoUrl.trim() !== '') {
+        const result = window.getVideoEmbedUrl(p.videoUrl, p.videoType);
+        if (result.url && result.url.trim() !== '') {
+          if (result.isMp4) {
+            mediaHTML = '<div class="product-video-wrap" onclick="event.stopPropagation();"><video src="' + window.escapeAttr(result.url) + '" muted controls playsinline preload="metadata" poster="' + window.escapeAttr(p.thumbnail || '') + '"></video></div>';
+          } else {
+            mediaHTML = '<div class="product-video-wrap" onclick="event.stopPropagation();"><iframe src="' + window.escapeAttr(result.url) + '" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>';
+          }
+        }
+      }
+      
+      if (!mediaHTML) {
+        if (p.thumbnail && typeof p.thumbnail === 'string' && p.thumbnail.trim() !== '') {
+          mediaHTML = '<img src="' + window.escapeAttr(p.thumbnail) + '" class="product-image">';
+        }
+      }
+      
+      return '<div class="product-card" onclick="window.openAbout(\'' + p.id + '\')">' +
+        mediaHTML +
+        '<div class="product-title">' + window.escapeHtml(p.title) + '</div>' +
+        '<div class="product-price">' + priceDisplay + '</div>' +
+        '<div class="product-actions">' +
+          '<button class="btn btn-secondary" style="flex:1;" onclick="event.stopPropagation(); window.openAbout(\'' + p.id + '\')"><i class="fas fa-info-circle"></i> Info</button>' +
+          bBtn +
+        '</div></div>';
+    }
+
+    window.renderProducts = function() {
+      const isLoggedIn = !!window.currentUser;
+      
+      const hl = document.getElementById('homeLatestGrid');
+      if (hl) { 
+        hl.innerHTML = ''; 
+        if (!isLoggedIn) {
+          hl.innerHTML = '<div class="locked-screen"><i class="fas fa-lock"></i><h3>🔒 Login to View Products</h3><p>សូម Login ដើម្បីមើលផលិតផលទាំងអស់</p><button onclick="window.showAuthModal()"><i class="fas fa-sign-in-alt"></i> Login Now</button></div>';
+        } else {
+          const latestList = window.allProducts.slice(0, 8); 
+          if (latestList.length === 0) {
+            hl.innerHTML = 
+              '<div class="welcome-dialog">' +
+                '<div class="welcome-dialog-icon"><i class="fas fa-crown"></i></div>' +
+                '<h2>សូមស្វាគមន៍មកកាន់ Rocky H4cks Store</h2>' +
+                '<p>នេះគឺជា <span class="highlight">Store របស់ខ្ញុំផ្ទាល់</span> ដែលមានដូចជា <span class="highlight">Modz Vip</span> និង <span class="highlight">ចែករបស់ Free</span> ជាដើម</p>' +
+                '<p>នៅក្នុង Store នេះ <span class="highlight">មិនមានការ Scam</span> ហើយបើបាន Scam គ្នាយើងត្រង់ណា អ្នកទាំងអស់គ្នាអាច <span class="highlight">Post បាន</span></p>' +
+                '<div class="warning"><i class="fas fa-shield-alt"></i> សូមអរគុណ!</div>' +
+              '</div>';
+          } else {
+            latestList.forEach(function(p){ hl.innerHTML += getCardHTML(p); });
+          }
+        }
+      }
+      
+      const pg = document.getElementById('paidGrid');
+      if (pg) { 
+        pg.innerHTML = ''; 
+        if (!isLoggedIn) {
+          pg.innerHTML = '<div class="locked-screen"><i class="fas fa-lock"></i><h3>🔒 Vip Modz Paid Only Locked</h3><p>សូម Login ដើម្បីមើលផលិតផល Premium</p><button onclick="window.showAuthModal()"><i class="fas fa-sign-in-alt"></i> Login Now</button></div>';
+        } else {
+          const paid = window.allProducts.filter(function(p){ return p.type === 'paid'; });
+          if (paid.length === 0) pg.innerHTML = '<div class="empty-state"><i class="fas fa-box-open"></i><br><h3>No Vip Modz Paid Only Found</h3></div>';
+          else paid.forEach(function(p){ pg.innerHTML += getCardHTML(p); });
+        }
+      }
+      
+      const fg = document.getElementById('freeGrid');
+      if (fg) { 
+        fg.innerHTML = ''; 
+        if (!isLoggedIn) {
+          fg.innerHTML = '<div class="locked-screen"><i class="fas fa-lock"></i><h3>🔒 Free Downloads Locked</h3><p>សូម Login ដើម្បីមើលផលិតផលឥតគិតថ្លៃ</p><button onclick="window.showAuthModal()"><i class="fas fa-sign-in-alt"></i> Login Now</button></div>';
+        } else {
+          const free = window.allProducts.filter(function(p){ return p.type === 'free'; });
+          if (free.length === 0) fg.innerHTML = '<div class="empty-state"><i class="fas fa-gift"></i><br><h3>No Free Products Found</h3></div>';
+          else free.forEach(function(p){ fg.innerHTML += getCardHTML(p); });
+        }
+      }
+    };
+
+    window.filterProducts = function(type) {
+      if (!window.currentUser) {
+        window.showAuthModal();
+        return;
+      }
+      const q = (document.getElementById(type === 'paid' ? 'searchPaid' : 'searchFree')?.value || '').toLowerCase();
+      const grid = document.getElementById(type === 'paid' ? 'paidGrid' : 'freeGrid');
+      if (!grid) return;
+      const arr = window.allProducts.filter(function(p){ return type === 'paid' ? p.type === 'paid' : p.type === 'free'; });
+      grid.innerHTML = '';
+      const filtered = arr.filter(function(p){ return (p.title || '').toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q) || (p.tags || '').toLowerCase().includes(q); });
+      if (filtered.length === 0) grid.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><br><h3>No results found</h3></div>';
+      else filtered.forEach(function(p){ grid.innerHTML += getCardHTML(p); });
+    };
+
+    window.showSuccessFromOwned = function(id) { const p = window.allProducts.find(function(x){ return x.id === id; }); if (p) showSuccessModal(p.downloadLink); };
+
+    window.openAbout = function(id) {
+      if (!window.currentUser) {
+        window.showAuthModal();
+        window.showNotification('🔒 សូម Login ជាមុនសិន', 'error');
+        return;
+      }
+      
+      const p = window.allProducts.find(function(x){ return x.id === id; });
+      if (!p) return;
+      
+      const imgContainer = document.getElementById('aboutImageContainer');
+      if (imgContainer) {
+        imgContainer.innerHTML = '';
+        const hasThumb = p.thumbnail && typeof p.thumbnail === 'string' && p.thumbnail.trim() !== '';
+        
+        if (hasThumb) {
+          const img = document.createElement('img');
+          img.id = 'aboutImage';
+          img.src = p.thumbnail;
+          img.style.cssText = 'width:130px;height:130px;object-fit:cover;border-radius:var(--radius-lg);background:var(--bg-elev);border:1px solid var(--border-soft);';
+          img.onerror = function() { this.remove(); };
+          imgContainer.appendChild(img);
+        }
+      }
+      
+      window.safeSet('aboutTitle', 'innerText', p.title);
+      const isFree = p.type === 'free' || (!p.price || parseFloat(p.price) === 0);
+      const isOwned = hasPaymentd(p.id);
+      window.safeSet('aboutPrice', 'innerHTML', isFree ? '<span style="color:var(--success);"><i class="fas fa-gift"></i> FREE</span>' : window.formatCurrency(p.price));
+      window.safeSet('aboutCategory', 'innerText', p.category || 'Software');
+      window.safeSet('aboutVersion', 'innerText', p.version || '1.0');
+      
+      const descEl = document.getElementById('aboutDesc');
+      if (descEl) {
+        descEl.innerHTML = p.description || 'No description provided.';
+      }
+      
+      const gal = document.getElementById('aboutGallery');
+      if (gal) {
+        gal.innerHTML = '';
+        const validImages = (p.images && Array.isArray(p.images)) 
+          ? p.images.filter(function(img) { return img && typeof img === 'string' && img.trim() !== ''; })
+          : [];
+        
+        if (validImages.length === 0) {
+          gal.style.display = 'none';
+        } else {
+          gal.style.display = 'flex';
+          validImages.forEach(function(imgSrc){ 
+            const img = document.createElement('img');
+            img.src = imgSrc;
+            img.style.cssText = 'height:90px;border-radius:var(--radius-md);cursor:pointer;';
+            img.onerror = function() { this.remove(); };
+            img.onclick = function() { window.open(this.src, '_blank'); };
+            gal.appendChild(img);
+          }); 
+        }
+      }
+      
+      const act = document.getElementById('aboutActionBtn');
+      if (act) {
+        const price = parseFloat(p.price || 0);
+        const balance = parseFloat(window.userBalance || 0);
+        const canAfford = isFree || balance >= price;
+        
+        if (isOwned) {
+          act.innerHTML = '<button class="btn btn-free" style="width:100%; padding:16px;" onclick="window.showSuccessFromOwned(\'' + p.id + '\')"><i class="fas fa-check-circle"></i> View Download Link</button>';
+        } else if (isFree) {
+          act.innerHTML = '<button class="btn btn-free" style="width:100%; padding:16px;" onclick="window.initBuy(\'' + p.id + '\')"><i class="fas fa-download"></i> Download Now</button>';
+        } else if (!canAfford) {
+          act.innerHTML = 
+            '<div style="background:rgba(239,68,68,0.15); border:1px solid var(--danger); border-radius:var(--radius-md); padding:14px; margin-bottom:12px; text-align:center;">' +
+              '<div style="color:var(--danger); font-weight:700; font-size:14px;"><i class="fas fa-exclamation-triangle"></i> លុយមិនគ្រប់គ្រាន់</div>' +
+              '<div style="color:var(--text-mid); font-size:12px; margin-top:8px;">ត្រូវការ: <strong style="color:var(--gold-1);">' + window.formatCurrency(price) + '</strong></div>' +
+              '<div style="color:var(--text-mid); font-size:12px; margin-top:4px;">អ្នកមាន: <strong style="color:var(--success);">' + window.formatCurrency(balance) + '</strong></div>' +
+              '<div style="color:var(--gold-1); font-size:12px; margin-top:8px;"><i class="fas fa-info-circle"></i> សូម Top Up ចូលគណនីជាមុន</div>' +
+            '</div>' +
+            '<button class="btn" style="width:100%; padding:16px; background: linear-gradient(135deg, var(--gold-1), var(--gold-2)); color: #0A0612;" onclick="window.closeModal(\'aboutModal\'); window.showTab(\'wallet\')"><i class="fas fa-wallet"></i> Top Up Now</button>';
+        } else {
+          act.innerHTML = '<button class="btn" style="width:100%; padding:16px;" onclick="window.initBuy(\'' + p.id + '\')"><i class="fas fa-bolt"></i> Buy for ' + window.formatCurrency(price) + '</button>';
+        }
+      }
+      
+      document.getElementById('aboutModal')?.classList.add('active');
+    };
+
+    window.initBuy = async function(id) {
+      if (!window.currentUser) { 
+        window.showAuthModal(); 
+        window.showNotification('Please login first', 'error'); 
+        return; 
+      }
+      if (hasPaymentd(id)) { 
+        window.showSuccessFromOwned(id); 
+        return; 
+      }
+      
+      const p = window.allProducts.find(function(x){ return x.id === id; });
+      if (!p) return;
+      
+      const isFree = p.type === 'free' || (!p.price || parseFloat(p.price) === 0);
+      
+      if (isFree) {
+        processFreeDownload(p);
+        return;
+      }
+      
+      const price = parseFloat(p.price || 0);
+      const balance = parseFloat(window.userBalance || 0);
+      
+      if (balance < price) {
+        window.showNotification(
+          '❌ លុយមិនគ្រប់គ្រាន់! ត្រូវការ ' + window.formatCurrency(price) + ' ប៉ុន្តែអ្នកមាន ' + window.formatCurrency(balance),
+          'error'
+        );
+        return;
+      }
+      
+      if (!confirm('តើអ្នកចង់ទិញ "' + p.title + '" ក្នុងតម្លៃ ' + window.formatCurrency(price) + '?\n\nលុយក្នុងគណនី: ' + window.formatCurrency(balance) + '\nលុយនៅសល់: ' + window.formatCurrency(balance - price))) {
+        return;
+      }
+      
+      await processBalancePayment(p, price);
+    };
+
+    async function processBalancePayment(p, price) {
+      if (!window.currentUser || !window.firebaseReady) return;
+      
+      window.showLoading('PROCESSING PURCHASE...');
+      
+      try {
+        const uid = window.currentUser.uid;
+        const oldBalance = parseFloat(window.userBalance || 0);
+        const newBalance = oldBalance - price;
+        
+        await window.dbSet(window.dbRef(window.db, 'users/' + uid + '/balance'), newBalance);
+        
+        const orderId = "ORD" + Date.now() + uid.substring(0, 4);
+        const orderRef = window.dbPush(window.dbRef(window.db, 'orders'));
+        await window.dbSet(orderRef, {
+          productId: p.id,
+          finalAmount: price,
+          productSnapshot: {
+            title: p.title,
+            imageUrl: p.thumbnail || '',
+            discountedPrice: price
+          },
+          userInput: {
+            name: window.currentUser.displayName || 'User',
+            email: window.currentUser.email,
+            utrId: 'BALANCE_PURCHASE'
+          },
+          userId: uid,
+          status: 'confirmed',
+          paymentMethod: 'Balance',
+          createdAt: new Date().toISOString()
+        });
+        
+        await window.dbPush(window.dbRef(window.db, 'purchaseHistory'), {
+          orderId: orderId,
+          txnId: 'TXN' + Date.now(),
+          uid: uid,
+          user: window.currentUser.displayName || 'User',
+          email: window.currentUser.email,
+          productId: p.id,
+          productSnapshot: {
+            title: p.title,
+            imageUrl: p.thumbnail || ''
+          },
+          paymentMethod: 'Balance',
+          discount: 0,
+          finalAmount: price,
+          status: 'Success',
+          date: new Date().toISOString()
+        });
+        
+        await window.dbPush(window.dbRef(window.db, 'topUpHistory'), {
+          uid: uid,
+          adminUsername: 'System',
+          username: window.currentUser.displayName || 'User',
+          email: window.currentUser.email,
+          type: 'debit',
+          amount: price,
+          oldBalance: oldBalance,
+          newBalance: newBalance,
+          note: 'Payment: ' + p.title,
+          adminBy: 'System (Auto)',
+          date: new Date().toISOString()
+        });
+        
+        await window.dbSet(window.dbRef(window.db, 'users/' + uid + '/purchasedProducts/' + p.id), {
+          purchasedAt: new Date().toISOString(),
+          price: price,
+          orderId: orderId
+        });
+        
+        window.updateBalanceUI(newBalance, oldBalance);
+        
+        window.hideLoading();
+        window.closeModal('aboutModal');
+        
+        showSuccessModal(p.downloadLink);
+        window.showNotification('✅ ទិញបានជោគជ័យ! លុយនៅសល់ ' + window.formatCurrency(newBalance), 'success');
+        
+      } catch (e) {
+        window.hideLoading();
+        console.error('Payment error:', e);
+        window.showNotification('❌ ការទិញបរាជ័យ: ' + (e.message || 'Unknown error'), 'error');
+      }
+    }
+
+    async function processFreeDownload(p) {
+      window.showLoading('GENERATING LINK...');
+      try {
+        const oRef = window.dbPush(window.dbRef(window.db, 'orders'));
+        await window.dbSet(oRef, { productId: p.id, finalAmount: 0, productSnapshot: { title: p.title, imageUrl: p.thumbnail, discountedPrice: 0 }, userInput: { name: window.currentUser.displayName || 'User', email: window.currentUser.email, utrId: 'FREE_DOWNLOAD' }, userId: window.currentUser.uid, status: 'confirmed', createdAt: new Date().toISOString() });
+        await window.dbSet(window.dbRef(window.db, 'users/' + window.currentUser.uid + '/downloadedProducts/' + p.id), { downloadedAt: new Date().toISOString() });
+        window.hideLoading(); window.closeModal('aboutModal'); showSuccessModal(p.downloadLink);
+      } catch (e) { window.hideLoading(); window.showNotification(e.message, 'error'); }
+    }
+
+    window.submitManualPayment = async function() {
+      if (!window._currentPayOrder || !window.currentUser) return;
+      const utr = (document.getElementById('payUtr')?.value || '').trim();
+      if (!utr || utr.length < 6) return window.showNotification('Please enter valid UTR (min 6 digits)', 'error');
+      const { orderId, product: p, amount: amt } = window._currentPayOrder;
+      window.showLoading('SENDING FOR VERIFICATION...');
+      try {
+        await window.dbSet(window.dbRef(window.db, 'pendingOrders/' + orderId), { productId: p.id, title: p.title, image: p.thumbnail || '', dlLink: p.downloadLink || '', amount: amt, userId: window.currentUser.uid, userName: window.currentUser.displayName || 'User', userEmail: window.currentUser.email, utr, status: 'pending', createdAt: new Date().toISOString() });
+        await window.dbPush(window.dbRef(window.db, 'payments'), { orderId, uid: window.currentUser.uid, username: window.currentUser.displayName || 'User', amount: amt, gateway: 'Manual UPI', status: 'Pending', utr, date: new Date().toISOString() });
+        window.hideLoading(); window.closeModal('manualPayModal'); window.showNotification('✅ Submitted! Admin will verify soon.', 'success');
+        window._currentPayOrder = null;
+      } catch (e) { window.hideLoading(); window.showNotification(e.message || 'Submit failed', 'error'); }
+    };
+
+    function showSuccessModal(link) {
+      if (!link) return window.showNotification('No download link available', 'error');
+      window.safeSet('successLinkInput', 'value', link);
+      const btn = document.getElementById('successOpenBtn');
+      if (btn) btn.onclick = function(){ window.open(link, '_blank'); };
+      document.getElementById('successModal')?.classList.add('active');
+    }
+    window.copySuccessLink = function() { const l = document.getElementById('successLinkInput'); if (!l) return; l.select(); try { document.execCommand('copy'); window.showNotification('✅ Copied!'); } catch(e){} };
+
+    window.renderOrders = function() {
+      const q = (document.getElementById('searchOrders')?.value || '').toLowerCase();
+      const list = document.getElementById('ordersList');
+      if (!list) return;
+      list.innerHTML = '';
+      const arr = window.allOrders.filter(function(o){ return (o.productSnapshot?.title || '').toLowerCase().includes(q) || (o.id || '').toLowerCase().includes(q); });
+      if (arr.length === 0) { list.innerHTML = '<div class="empty-state"><i class="fas fa-box-open"></i><br><h3>No Orders Found</h3></div>'; return; }
+      arr.forEach(function(o) {
+        const p = window.allProducts.find(function(x){ return x.id === o.productId; });
+        const dl = p ? p.downloadLink : '';
+        const isPaid = parseFloat(o.finalAmount) > 0;
+        const oDate = new Date(o.createdAt || 0).toLocaleDateString();
+        
+        let imgHTML = '';
+        if (o.productSnapshot?.imageUrl && typeof o.productSnapshot.imageUrl === 'string' && o.productSnapshot.imageUrl.trim() !== '') {
+          imgHTML = '<img src="' + window.escapeAttr(o.productSnapshot.imageUrl) + '" class="data-img" onerror="this.remove()">';
+        }
+        
+        list.innerHTML += '<div class="data-item">' +
+          imgHTML +
+          '<div style="flex:1; min-width: 180px;">' +
+            '<h3 style="color:var(--text-hi); font-size:15px; font-weight: 700;">' + window.escapeHtml(o.productSnapshot?.title || 'Product') + '</h3>' +
+            '<p style="font-size:12px; color:var(--text-mid); margin-top: 4px;">ID: ' + (o.id||'').substring(0,8).toUpperCase() + ' | Date: ' + oDate + '</p>' +
+            '<p style="color:var(--gold-1); font-weight:bold; margin-top: 4px;">' + (isPaid ? window.formatCurrency(o.finalAmount) : '<span style="color:var(--success);">FREE</span>') + '</p>' +
+          '</div>' +
+          '<div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">' +
+            '<span style="font-size:10px; padding:6px 12px; border-radius:var(--radius-sm); background:rgba(16, 185, 129, 0.15); color:var(--success); border:1px solid var(--success); font-weight: 700;">' + (o.status||'').toUpperCase() + '</span>' +
+            ((o.status === 'confirmed' && dl) ? '<button class="btn btn-free" style="padding:8px 14px; font-size:11px;" data-link="' + window.escapeAttr(dl) + '" onclick="window.open(this.dataset.link,\'_blank\')"><i class="fas fa-download"></i> Download</button>' : '') +
+          '</div>' +
+        '</div>';
+      });
+    };
+
+    window.renderHistory = function() {
+      const q = (document.getElementById('searchHistory')?.value || '').toLowerCase();
+      const list = document.getElementById('historyList');
+      if (!list) return;
+      list.innerHTML = '';
+      const arr = window.allPayments.filter(function(p){ return (p.orderId || '').toLowerCase().includes(q) || (p.utr || '').toLowerCase().includes(q); });
+      if (arr.length === 0) { list.innerHTML = '<div class="empty-state"><i class="fas fa-file-invoice-dollar"></i><br><h3>No Transactions Found</h3></div>'; return; }
+      arr.forEach(function(p) {
+        const statusColor = p.status === 'Success' ? 'var(--success)' : p.status === 'Pending' ? 'var(--warning)' : 'var(--danger)';
+        list.innerHTML += '<div class="data-item">' +
+          '<div style="width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg, var(--purple-1), var(--gold-1)); color:#FFF; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink: 0;"><i class="fas fa-receipt"></i></div>' +
+          '<div style="flex:1; min-width: 180px;">' +
+            '<h3 style="color:var(--text-hi); font-size:14px; font-weight: 700;">TXN: ' + window.escapeHtml(p.utr || p.orderId) + '</h3>' +
+            '<p style="font-size:12px; color:var(--text-mid); margin-top: 4px;">Date: ' + new Date(p.date || 0).toLocaleString() + ' | ' + window.escapeHtml(p.gateway) + '</p>' +
+          '</div>' +
+          '<div style="text-align:right;">' +
+            '<div style="color:var(--gold-1); font-weight:900; font-family:var(--font-display); font-size:18px;">' + window.formatCurrency(p.amount) + '</div>' +
+            '<span style="font-size:11px; color:' + statusColor + '; font-weight: 700;">' + (p.status||'').toUpperCase() + '</span>' +
+          '</div>' +
+        '</div>';
+      });
+    };
+  </script>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
+    import { getDatabase, ref, get, set, push, onValue, remove } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js';
+
+    const safeSet = window.safeSet;
+    const escapeHtml = window.escapeHtml;
+    const escapeAttr = window.escapeAttr;
+    const showLoading = window.showLoading;
+    const hideLoading = window.hideLoading;
+    const showNotification = window.showNotification;
+    const closeModal = window.closeModal;
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDvV5L-Xz4ZBS1L0KNmE28wjVkOx-zEB8U",
+      authDomain: "rockyhacks-eafbf.firebaseapp.com",
+      databaseURL: "https://rockyhacks-eafbf-default-rtdb.firebaseio.com",
+      projectId: "rockyhacks-eafbf",
+      storageBucket: "rockyhacks-eafbf.firebasestorage.app",
+      messagingSenderId: "477745594369",
+      appId: "1:477745594369:android:99fb6da6ebaf1b1c5fc000"
+    };
+
+    let app, auth, db;
+    try {
+      app = initializeApp(firebaseConfig, 'user-app');
+      auth = getAuth(app);
+      db = getDatabase(app);
+      window.firebaseReady = true;
+    } catch (e) { console.error("Firebase init error:", e); window.firebaseReady = false; }
+
+    if (window.firebaseReady) {
+      window.auth = auth; window.db = db;
+      window.dbRef = ref; window.dbGet = get; window.dbSet = set;
+      window.dbPush = push; window.dbOnValue = onValue; window.dbRemove = remove;
+      window.authSignIn = signInWithEmailAndPassword;
+      window.authSignUp = createUserWithEmailAndPassword;
+      window.authSignOut = signOut;
+      window.authUpdate = updateProfile;
+      window.authUpdatePassword = updatePassword;
+      window.reauthenticateWithCredential = reauthenticateWithCredential;
+      window.EmailAuthProvider = EmailAuthProvider;
+    }
+
+    window._unsubscribers = [];
+    window._userUnsubs = [];
+
+    window._shownNotifications = new Set();
+
+    // ✅ Function ពិនិត្យ Admin
+    async function isAdminUser(user) {
+      if (!user || !window.firebaseReady) return false;
+      try {
+        const adminSnap = await window.dbGet(window.dbRef(window.db, 'meta/adminSetup'));
+        if (adminSnap.exists() && adminSnap.val().email) {
+          if ((user.email || '').toLowerCase() === adminSnap.val().email.toLowerCase()) return true;
+        }
+        const extraSnap = await window.dbGet(window.dbRef(window.db, 'meta/adminEmails'));
+        if (extraSnap.exists()) {
+          const extras = Object.values(extraSnap.val());
+          if (extras.some(e => e && (user.email || '').toLowerCase() === e.toLowerCase())) return true;
+        }
+      } catch(e) { console.error('Admin check error:', e); }
+      return false;
+    }
+
+    window.signupUser = async function() {
+      const n = (document.getElementById('signupName')?.value || '').trim();
+      const e = (document.getElementById('signupEmail')?.value || '').trim();
+      const p = document.getElementById('signupPassword')?.value || '';
+      if (!n || !e || !p) return showNotification('Please fill in all fields', 'error');
+      if (p.length < 6) return showNotification('Password must be at least 6 characters', 'error');
+      if (!window.firebaseReady) return showNotification('Service temporarily unavailable', 'error');
+      
+      showLoading('CREATING ACCOUNT...');
+      try {
+        const cred = await window.authSignUp(window.auth, e, p);
+        await window.authUpdate(cred.user, { displayName: n });
+        await cred.user.reload();
+        try { await cred.user.getIdToken(true); } catch(e2){}
+
+        const adminUsername = window.generateAdminUsername();
+
+        await window.dbSet(window.dbRef(window.db, 'users/' + cred.user.uid), { 
+          uid: cred.user.uid, 
+          username: n, 
+          email: e, 
+          adminUsername: adminUsername,
+          balance: 0, 
+          createdAt: new Date().toISOString(), 
+          lastLogin: new Date().toISOString() 
+        });
+        
+        await window.dbSet(window.dbRef(window.db, 'usernames/' + cred.user.uid), { username: n, email: e, createdAt: new Date().toISOString() });
+
+        await window.dbSet(window.dbRef(window.db, 'adminUsernames/' + adminUsername), {
+          uid: cred.user.uid,
+          username: n,
+          email: e,
+          createdAt: new Date().toISOString()
+        });
+
+        // ✅ កំណត់ User Session
+        localStorage.setItem('user_session_active', 'true');
+
+        window.currentUser = cred.user;
+        safeSet('profileName', 'innerText', n);
+        safeSet('profileEmail', 'innerText', e);
+        safeSet('settingCurrentName', 'value', n);
+        safeSet('profileAdminUsername', 'innerText', adminUsername);
+        safeSet('settingAdminUsername', 'value', adminUsername);
+        
+        closeModal('authModal');
+        showNotification('✅ Account created! Your ID is ' + adminUsername, 'success');
+      } catch (er) {
+        console.error('Signup error:', er);
+        let msg = 'Registration failed. Please try again.';
+        switch (er.code) {
+          case 'auth/email-already-in-use': msg = 'This email is already registered.'; break;
+          case 'auth/invalid-email': msg = 'Invalid email address.'; break;
+          case 'auth/weak-password': msg = 'Password is too weak (min 6 characters).'; break;
+          case 'auth/operation-not-allowed': msg = 'Email sign-up is currently disabled.'; break;
+          case 'auth/network-request-failed': msg = 'Network error. Check your connection.'; break;
+        }
+        showNotification(msg, 'error');
+      } finally { hideLoading(); }
+    };
+
+    window.loginUser = async function() {
+      const e = (document.getElementById('loginEmail')?.value || '').trim();
+      const p = (document.getElementById('loginPassword')?.value || '').trim();
+      if (!e || !p) return showNotification('Please enter email and password', 'error');
+      if (!window.firebaseReady) return showNotification('Service temporarily unavailable', 'error');
+      showLoading('AUTHENTICATING...');
+      try {
+        const cred = await window.authSignIn(window.auth, e, p);
+        // ✅ កំណត់ User Session
+        localStorage.setItem('user_session_active', 'true');
+        try { await window.dbSet(window.dbRef(window.db, 'users/' + cred.user.uid + '/lastLogin'), new Date().toISOString()); } catch(e2) {}
+        closeModal('authModal');
+        showNotification('✅ Welcome back!', 'success');
+      } catch (er) {
+        console.error('Login error:', er);
+        let msg = 'Login failed. Please try again.';
+        switch (er.code) {
+          case 'auth/user-not-found': msg = 'Account not found.'; break;
+          case 'auth/wrong-password': msg = 'Incorrect password.'; break;
+          case 'auth/invalid-credential': msg = 'Invalid email or password.'; break;
+          case 'auth/invalid-email': msg = 'Invalid email address.'; break;
+          case 'auth/user-disabled': msg = 'This account has been disabled.'; break;
+          case 'auth/too-many-requests': msg = 'Too many attempts. Try again later.'; break;
+          case 'auth/network-request-failed': msg = 'Network error. Check your connection.'; break;
+        }
+        showNotification(msg, 'error');
+      } finally { hideLoading(); }
+    };
+
+    window.logoutUser = async function() {
+      showLoading('LOGGING OUT...');
+      const isLight = document.body.classList.contains('light-theme');
+      try {
+        // ✅ លុប User Session
+        localStorage.removeItem('user_session_active');
+        if (window.firebaseReady && window.auth) await window.authSignOut(window.auth);
+        localStorage.clear();
+        sessionStorage.clear();
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        window.currentUser = null;
+        window.allOrders = []; window.allPayments = []; window.allTopUps = []; window.userBalance = 0;
+        window._shownNotifications.clear();
+        try { await window.updateAuthUI(); } catch(e){}
+        try { window.renderProducts(); } catch(e){}
+        document.querySelectorAll('.menu-item').forEach(function(i){ i.classList.remove('active'); });
+        const hm = document.querySelector('[data-tab="home"]');
+        if (hm) hm.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(function(c){ c.classList.remove('active'); });
+        const ht = document.getElementById('homeTab');
+        if (ht) ht.classList.add('active');
+        hideLoading();
+        showNotification('✅ Logged out successfully', 'success');
+      } catch (e) { hideLoading(); showNotification(e.message || 'Logout failed', 'error'); }
+    };
+
+    window.updateUsername = async function() {
+      if (!window.currentUser || !window.firebaseReady) return;
+      const newName = (document.getElementById('settingNewName')?.value || '').trim();
+      if (!newName) return showNotification('Please enter a new username', 'error');
+      if (newName.length < 3) return showNotification('Username must be at least 3 characters', 'error');
+      showLoading('UPDATING PROFILE...');
+      try {
+        await window.authUpdate(window.currentUser, { displayName: newName });
+        await window.dbSet(window.dbRef(window.db, 'users/' + window.currentUser.uid + '/username'), newName);
+        await window.dbSet(window.dbRef(window.db, 'usernames/' + window.currentUser.uid + '/username'), newName);
+        safeSet('profileName', 'innerText', newName);
+        safeSet('settingCurrentName', 'value', newName);
+        const inp = document.getElementById('settingNewName');
+        if (inp) inp.value = '';
+        showNotification('✅ Username updated!', 'success');
+      } catch (e) { showNotification('Update failed. Please try again.', 'error'); }
+      finally { hideLoading(); }
+    };
+
+    window.updatePassword = async function() {
+      if (!window.currentUser || !window.firebaseReady) return;
+      const curPass = document.getElementById('settingCurrentPassword')?.value || '';
+      const newPass = document.getElementById('settingNewPassword')?.value || '';
+      const confPass = document.getElementById('settingConfirmPassword')?.value || '';
+      if (!curPass || !newPass || !confPass) return showNotification('Please fill all password fields', 'error');
+      if (newPass !== confPass) return showNotification('New passwords do not match', 'error');
+      if (newPass.length < 6) return showNotification('Password must be at least 6 characters', 'error');
+      showLoading('VERIFYING & UPDATING...');
+      try {
+        const cred = window.EmailAuthProvider.credential(window.currentUser.email, curPass);
+        await window.reauthenticateWithCredential(window.currentUser, cred);
+        await window.authUpdatePassword(window.currentUser, newPass);
+        ['settingCurrentPassword','settingNewPassword','settingConfirmPassword'].forEach(function(id){ const el = document.getElementById(id); if (el) el.value = ''; });
+        showNotification('✅ Password updated!', 'success');
+      } catch (e) {
+        let msg = 'Password update failed.';
+        if (e.code === 'auth/wrong-password') msg = 'Current password is incorrect.';
+        if (e.code === 'auth/weak-password') msg = 'New password is too weak.';
+        showNotification(msg, 'error');
+      } finally { hideLoading(); }
+    };
+
+    function initDataListeners() {
+      if (!window.firebaseReady || !window.db) return;
+      showLoading('LOADING STORE...');
+      const unsubGeneral = onValue(ref(window.db, 'settings/general'), function(s) {
+        if (s.exists()) {
+          const d = s.val();
+          window.storeCurrency = d.currency || '$';
+          if (d.siteName) safeSet('headerBrandName', 'innerText', d.siteName);
+          if (d.logo) { const logo = document.getElementById('headerLogo'); if (logo) { logo.src = d.logo; logo.style.display = 'block'; } }
+          if (d.storeBanner) { const banner = document.getElementById('storeBanner'); if (banner) { banner.src = d.storeBanner; banner.style.display = 'block'; } }
+          if (d.announcementBar) { safeSet('announcementText', 'innerText', d.announcementBar); const ann = document.getElementById('announcementBar'); if (ann) ann.style.display = 'flex'; }
+        }
+        setTimeout(function() { hideLoading(); }, 3000);
+      }, function(err){ hideLoading(); });
+      window._unsubscribers.push(unsubGeneral);
+
+      const unsubPay = onValue(ref(window.db, 'settings/payment'), function(s) { if (s.exists()) window.pgSettings = s.val(); }, function(err){});
+      window._unsubscribers.push(unsubPay);
+
+      const unsubProd = onValue(ref(window.db, 'products'), function(s) {
+        window.allProducts = [];
+        if (s.exists()) {
+          const val = s.val();
+          if (val.paid && typeof val.paid === 'object') { Object.entries(val.paid).forEach(function(entry) { const id = entry[0], p = entry[1]; if (p && p.status !== 'hidden') window.allProducts.push(Object.assign({ id, type: 'paid' }, p)); }); }
+          if (val.free && typeof val.free === 'object') { Object.entries(val.free).forEach(function(entry) { const id = entry[0], p = entry[1]; if (p && p.status !== 'hidden') window.allProducts.push(Object.assign({ id, type: 'free' }, p)); }); }
+          Object.keys(val).forEach(function(k) { if (k !== 'paid' && k !== 'free' && typeof val[k] === 'object' && val[k] !== null) { const p = val[k]; if (p.status !== 'hidden') { const legacyType = (p.price && parseFloat(p.price) > 0) ? 'paid' : 'free'; window.allProducts.push(Object.assign({ id: k, type: legacyType, legacy: true }, p)); } } });
+          window.allProducts.sort(function(a, b){ return (b.displayOrder || 0) - (a.displayOrder || 0); });
+        }
+        try { window.renderProducts(); } catch (e) {}
+        hideLoading();
+      }, function(err){ hideLoading(); showNotification('⚠️ Cannot load products', 'error'); });
+      window._unsubscribers.push(unsubProd);
+
+      const unsubContact = onValue(ref(window.db, 'supportLinks'), function(s) {
+        const cg = document.getElementById('contactGrid');
+        if (!cg) return;
+        cg.innerHTML = '';
+        if (s.exists()) {
+          Object.values(s.val()).forEach(function(l) {
+            if (!l) return;
+            let logoHTML = '';
+            if (l.logo && typeof l.logo === 'string' && l.logo.trim() !== '') {
+              logoHTML = '<img src="' + escapeAttr(l.logo) + '" style="width:54px;height:54px;object-fit:cover;border-radius:var(--radius-md);border:2px solid var(--border-mid);" onerror="this.remove()">';
+            }
+            cg.innerHTML += '<div class="product-card" style="flex-direction:row; align-items:center; gap:16px; padding:22px;">' +
+              logoHTML +
+              '<div style="flex:1;"><h3 style="color:var(--text-hi); font-size:15px;">' + escapeHtml(l.name) + '</h3></div>' +
+              '<button class="btn btn-secondary" data-link="' + escapeAttr(l.link) + '" onclick="window.open(this.dataset.link,\'_blank\')">Open</button>' +
+            '</div>';
+          });
+        }
+      }, function(err){});
+      window._unsubscribers.push(unsubContact);
+    }
+
+    if (window.firebaseReady && window.auth) {
+      onAuthStateChanged(window.auth, async function(user) {
+        window.currentUser = user;
+        
+        // ✅ ពិនិត្យ Admin Session (ដូច Amazon)
+        const adminSession = localStorage.getItem('admin_session_active');
+        if (adminSession === 'true') {
+          localStorage.removeItem('admin_session_active');
+          localStorage.removeItem('admin_email');
+          if (user) {
+            await window.authSignOut(window.auth);
+            window.location.reload();
+            return;
+          }
+        }
+        
+        // ✅ ពិនិត្យ Admin Email
+        if (user) {
+          const isAdmin = await isAdminUser(user);
+          if (isAdmin) {
+            await window.authSignOut(window.auth);
+            window.showNotification('⚠️ Admin មិនអាចចូល User Panel បានទេ! សូមប្រើ Admin Panel ជំនួស', 'error');
+            return;
+          }
+        }
+        
+        if (window._userUnsubs) { window._userUnsubs.forEach(function(fn){ try { fn(); } catch(e){} }); }
+        window._userUnsubs = [];
+        window._shownNotifications.clear();
+        if (user && !user.displayName) {
+          try { const snap = await window.dbGet(window.dbRef(window.db, 'users/' + user.uid + '/username')); if (snap.exists()) { const dbName = snap.val(); try { await window.authUpdate(user, { displayName: dbName }); } catch(e2){} } } catch(e) {}
+        }
+        try { await window.updateAuthUI(); } catch(e){}
+        if (user) {
+          (async function() {
+            try {
+              const snap = await window.dbGet(window.dbRef(window.db, 'users/' + user.uid));
+              if (!snap.exists()) {
+                const adminUsername = window.generateAdminUsername();
+                await window.dbSet(window.dbRef(window.db, 'users/' + user.uid), { 
+                  uid: user.uid, 
+                  username: user.displayName || (user.email || 'User').split('@')[0], 
+                  email: user.email, 
+                  adminUsername: adminUsername,
+                  balance: 0, 
+                  createdAt: new Date().toISOString(), 
+                  lastLogin: new Date().toISOString() 
+                });
+                await window.dbSet(window.dbRef(window.db, 'adminUsernames/' + adminUsername), {
+                  uid: user.uid,
+                  username: user.displayName || (user.email || 'User').split('@')[0],
+                  email: user.email,
+                  createdAt: new Date().toISOString()
+                });
+              } else {
+                const userData = snap.val();
+                if (!userData.adminUsername) {
+                  const newAdminUsername = window.generateAdminUsername();
+                  await window.dbSet(window.dbRef(window.db, 'users/' + user.uid + '/adminUsername'), newAdminUsername);
+                  await window.dbSet(window.dbRef(window.db, 'adminUsernames/' + newAdminUsername), {
+                    uid: user.uid,
+                    username: userData.username || (user.email || 'User').split('@')[0],
+                    email: user.email,
+                    createdAt: new Date().toISOString()
+                  });
+                }
+                await window.dbSet(window.dbRef(window.db, 'users/' + user.uid + '/lastLogin'), new Date().toISOString());
+              }
+            } catch(e) {}
+          })();
+
+          (async function loadInitialBalance() {
+            try {
+              const balSnap = await window.dbGet(window.dbRef(window.db, 'users/' + user.uid + '/balance'));
+              window.userBalance = balSnap.exists() ? parseFloat(balSnap.val() || 0) : 0;
+              window.updateBalanceUI(window.userBalance);
+            } catch(e) { console.error('Initial balance error:', e); }
+          })();
+
+          const unsubBalance = onValue(ref(window.db, 'users/' + user.uid + '/balance'), function(s) { 
+            const oldBal = window.userBalance || 0;
+            const newBal = s.exists() ? parseFloat(s.val() || 0) : 0;
+            
+            window.updateBalanceUI(newBal, oldBal);
+            
+            if (newBal > oldBal) {
+              const diff = newBal - oldBal;
+              setTimeout(function() {
+                window.showNotification('💰 +' + window.formatCurrency(diff) + ' added to your balance!', 'success');
+              }, 800);
+            }
+            
+            try { window.updateProfileStats(); } catch(e){}
+          }, function(err){ console.error('Balance listener error:', err); });
+          window._userUnsubs.push(unsubBalance);
+
+          const unsubNotifications = onValue(ref(window.db, 'users/' + user.uid + '/notifications'), function(s) {
+            if (!s.exists()) return;
+            
+            s.forEach(function(c) {
+              const n = c.val();
+              if (!n || n.read) return;
+              
+              if (window._shownNotifications.has(c.key)) return;
+              window._shownNotifications.add(c.key);
+              
+              const msg = n.type === 'topup' 
+                ? '💰 ' + n.message 
+                : (n.type === 'refund' ? '💸 ' + n.message : '⚠️ ' + n.message);
+              
+              window.showNotification(msg, (n.type === 'topup' || n.type === 'refund') ? 'success' : 'error');
+              
+              window.dbSet(window.dbRef(window.db, 'users/' + user.uid + '/notifications/' + c.key + '/read'), true)
+                .catch(function(err) { console.error('Mark read error:', err); });
+            });
+          }, function(err){ console.error('Notification listener error:', err); });
+          window._userUnsubs.push(unsubNotifications);
+
+          const unsubOrders = onValue(ref(window.db, 'orders'), function(s) {
+            window.allOrders = [];
+            if (s.exists()) { Object.entries(s.val()).forEach(function(entry) { const id = entry[0], o = entry[1]; if (o && o.userId === user.uid) window.allOrders.push(Object.assign({ id }, o)); }); window.allOrders.sort(function(a, b){ return new Date(b.createdAt || 0) - new Date(a.createdAt || 0); }); }
+            try { window.renderOrders(); window.updateProfileStats(); window.renderProducts(); } catch(e){}
+          }, function(err){});
+          window._userUnsubs.push(unsubOrders);
+
+          const unsubPay = onValue(ref(window.db, 'payments'), function(s) {
+            window.allPayments = [];
+            if (s.exists()) { Object.entries(s.val()).forEach(function(entry) { const id = entry[0], p = entry[1]; if (p && p.uid === user.uid) window.allPayments.push(Object.assign({ id }, p)); }); window.allPayments.sort(function(a, b){ return new Date(b.date || 0) - new Date(a.date || 0); }); }
+            try { window.renderHistory(); } catch(e){}
+          }, function(err){});
+          window._userUnsubs.push(unsubPay);
+
+          const unsubTopUps = onValue(ref(window.db, 'topUps'), function(s) {
+            window.allTopUps = [];
+            if (s.exists()) { Object.entries(s.val()).forEach(function(entry) { const id = entry[0], t = entry[1]; if (t && t.uid === user.uid) window.allTopUps.push(Object.assign({ id }, t)); }); window.allTopUps.sort(function(a, b){ return new Date(b.date || 0) - new Date(a.date || 0); }); }
+            try { window.renderWalletHistory(); } catch(e){}
+          }, function(err){});
+          window._userUnsubs.push(unsubTopUps);
+        } else {
+          window.allOrders = []; window.allPayments = []; window.allTopUps = []; window.userBalance = 0;
+          try { window.renderProducts(); } catch(e){}
+        }
+      });
+    } else {
+      try { window.updateAuthUI(); } catch(e){}
+    }
+
+    if (window.firebaseReady) {
+      initDataListeners();
+      setTimeout(function() {
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay && overlay.classList.contains('active')) { hideLoading(); }
+      }, 5000);
+    }
+  </script>
+</body>
+</html>
